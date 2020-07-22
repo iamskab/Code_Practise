@@ -1,0 +1,47 @@
+class Solution {
+public:
+    Solution(){
+        ios_base::sync_with_stdio(false);
+        cin.tie(NULL);
+    }
+    vector<int> prisonAfterNDays(vector<int>& cells, int N) {
+        //HashMap to store history of occurances of each bit combination and detect a cycle.
+        unordered_map<bitset<8>, int> hashMap;
+        //Vector to store the bitsets occured in the order.
+        vector<bitset<8>> history;
+        bitset<8> b;
+        //Converts vector to bitset.
+        for(int i=0; i<cells.size(); i++){
+            b[i] = cells[i];
+        }
+        int j = 0;
+        hashMap[b] = j++; 
+        history.push_back(b);
+        
+        while(N--){
+            bitset<8> b2;
+            b = history.back();
+            //Generates a new combo.
+            for(int i=1; i<b.size()-1; i++){
+                b2[i] = (b[i-1]==b[i+1]) ? 1 : 0;
+            }
+            //If bitset combination already occured then end the iteration.
+            if(hashMap.count(b2)>0){
+                int cycleBegin = hashMap[b2]; //Gets the index at which cycle begin.
+                int cycleLength = j-cycleBegin; //Gets total cycle length
+                history.push_back(history[cycleBegin + (N)%cycleLength]); //Gets bitset which is result.
+                break;
+            }
+            //If bitset is a new one stores in hashMap and history.
+            hashMap[b2] = j++;
+            history.push_back(b2);
+        }
+        //Generates a result array with the bitset result.
+        vector<int> res;
+        b = history.back();
+        for(int i=0; i<b.size(); i++){
+            res.push_back(b[i]);
+        }
+        return res;
+    }
+};
